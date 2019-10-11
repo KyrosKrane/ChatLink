@@ -21,26 +21,38 @@ if not ChatLinks then return end
 
 -- Set up the callback handler
 local CBH = LibStub("CallbackHandler-1.0")
+assert(CBH, MAJOR .. " requires CallbackHandler-1.0")
 ChatLinks.callbacks = ChatLinks.callbacks or CBH:New(ChatLinks, nil, nil, false)
 
 
--- Initialize a random seed and get a random value for our self ID.
-math.randomseed( os.time() )
+--Get a random value for our self ID.
 local NumDigits = 7 -- 8 causes an integer overflow
-ChatLinks.ID=string.format(string.format("0x%%%d.%dX", NumDigits, NumDigits), math.random() * 16^NumDigits) -- yeah, this is a little silly.
+ChatLinks.ID = string.format(string.format("0x%%%d.%dX", NumDigits, NumDigits), math.random() * 16^NumDigits) -- yeah, this is a little silly.
 
--- Keep a running count of how many links we've made.
-ChatLinks.NextLinkID = 0
+
+-- These settings control the link's data portion
+
+-- This is the Blizzard link type. It can only be one of a set number of values, documented here:
+-- https://wow.gamepedia.com/UI_escape_sequences
+-- And of those, only a very few can be overloaded for our purposes. The "garrmission" type is safest to use.
+local BLIZZ_LINK_TYPE = "garrmission"
+
+-- Set the link type's data paramater used by this library
+ChatLinks.LinkType = "ChatLink"
+
+
+-- These settings control the link's display portion.
 
 -- Set the default link color
 ChatLinks.Highlight = "FFFF0000"
 
--- Set the link type used by this library
-ChatLinks.LinkType = "ChatLink"
+
+-- These settings control the callback functionality
+
+-- Keep a running count of how many links we've made.
+ChatLinks.NextLinkID = 0
 
 
--- These settings control the link
-local BLIZZ_LINK_TYPE = "garrmission"
 
 
 --[[
@@ -57,7 +69,7 @@ Inputs:
 	skipformat
 		an optional boolean defaulting to false.
 		If it is true, the function will use displaytext verbatim, without applying formatting. The calling addon supplies its own formatting.
-		If it is false, the library will automatically enclose displaytext in [ [ ] ] brackets and highlight it in color for visibility.
+		If it is false or nil (not specified), the library will automatically enclose displaytext in [ [ ] ] brackets and highlight it in color for visibility.
 	clickevent
 		the event name of a callback event that is fired when the user clicks a link.
 		If it is nil or omitted, an arbitrary value is generated.
@@ -94,8 +106,7 @@ function ChatLinks:CreateChatLink(displaytext, data, skipformat, clickevent)
 	end
 
 	-- Next, assemble the data portion
-	if not data then data = "" end
-	local DataPart = ("%s:%s:%s"):format(BLIZZ_LINK_TYPE, ChatLinks.LinkType, data)
+	local DataPart = ("%s:%s:%s"):format(BLIZZ_LINK_TYPE, ChatLinks.LinkType, data or "")
 
 	-- Now we get the callback ID
 	local CallbackID
@@ -108,9 +119,9 @@ function ChatLinks:CreateChatLink(displaytext, data, skipformat, clickevent)
 		CallbackID = string.format("%s-%s", ChatLinks.ID, ChatLinks.NextLinkID)
 	end
 
-	-- Finally, we set up the callback
+	-- After that, we set up the callback
 	-- @TODO: fill this in
 
-	-- Finally, return the callback and the event name.
+	-- Finally, return the link and the event name.
 	return ("|H%s|h%s|h"):format(DataPart, TextPart), CallbackID
 end
