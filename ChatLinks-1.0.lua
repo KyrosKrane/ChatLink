@@ -1,15 +1,17 @@
-
--- Documentation here
-
+-- ChatLinks-1.0.lua
+-- Written by KyrosKrane Sylvanblade (kyros@kyros.info)
+-- Copyright (c) 2019 KyrosKrane Sylvanblade
+-- Licensed under the MIT License, as per the included file.
 
 --[[
+	@TODO: Describe the library better here.
+
 	Sample use cases
 
 	1) An addon alerts the user to an issue by adding a line to the chat. The user can click a chat link to open a window (addon frame) with more information.
 	2) An addon identifies a rare and puts its location in the zone general chat. Any user who also has the addon installed should be able to click the chat link to add a waypoint arrow to Tomtom (or similar).
 	3) A roleplaying/storytelling addon allows a group of players to create a branching text system. The "GM" pre-populates a set of story segments and responses. Each segment has key words highlighted, and when other players indicate interest in the key words, the appropriate response is given (optionally with more key words). Other players in the group can click the chat text to "respond" and hear the next segment of the story.
 ]]
-
 
 
 -- Use Libstub to set up as a library
