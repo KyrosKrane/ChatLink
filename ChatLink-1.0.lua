@@ -50,9 +50,8 @@
 				CallbackID
 					The same callback ID that was returned by CreateChatLink()
 				DisplayText
-					The DisplayText that was passed to CreateChatLink().
-					DisplayText will be modified if SkipFormat is not true.
-					If SkipFormat is nil or false, it will be returned unchanged.
+					The DisplayText that was passed to CreateChatLink(), as modified by that function.
+					See "SkipFormat" in the Link Creation API below for how this might differ from what was passed in.
 				Data
 					The Data that was passed to CreateChatLink().
 					Data is returned unchanged.
@@ -67,29 +66,28 @@
 		Inputs:
 
 			DisplayText
-				a required text string that will be displayed in the user's chat to click on.
-				If SkipFormat is false or nil, pipe symbols will be escaped to prevent corrupting the chat link.
+				A required text string that will be displayed in the user's chat to click on.
+				See SkipFormat below on how this value might get modified.
 			Data
-				an optional text string included as a parameter in the chat link, then passed to the callback function when the link is clicked.
+				An optional text string included as a parameter in the chat link, then passed to the callback function when the link is clicked.
 				It's intended to help the calling addon distinguish which text link was clicked, in case it makes multiple links with identical display text.
 				This must NOT include any pipe characters (|). If it does, the function returns the error values nil, nil.
 			SkipFormat
-				an optional boolean defaulting to false.
-				If it is true, the function will use DisplayText verbatim, without applying formatting. The calling addon supplies its own formatting.
-				If it is false or nil (not specified), the library will automatically enclose DisplayText in [ [ ] ] brackets and highlight it in color for visibility.
+				An optional boolean defaulting to false.
+				If it is true, the function will use DisplayText verbatim, without applying formatting. The calling addon supplies its own formatting. Note that pipe symbols are NOT escapte if SkipFormat is true, which means it's up to the calling addon to ensure the pipes are correct and don't corrupt the link.
+				If it is false or nil (not specified), the library will automatically enclose DisplayText in brackets and highlight it in color for visibility.  Pipe symbols will also be escaped to prevent corrupting the chat link.
 			CallbackID
-				the optional event name of a callback event that is fired when the user clicks a link.
+				The optional event name of a callback event that is fired when the user clicks a link.
 				If it is nil or omitted, an arbitrary value is generated.
-				This should usually be omitted so that the library generates a unique value.
-				If you include it, it must be globally unique across ALL addons that use ChatLink,
-				or you may accidentally fire an event for another addon that registered the same name.
-				This behavior may be used intentionally by addons that coordinate to use certain event names in common.
+				This should usually be omitted so that the library generates a unique value for each link.
+				If you include it, it must be globally unique across ALL addons that use ChatLink, or you may accidentally fire an event for another addon that registered the same name.
+				This feature can be used for multiple addons that coordinate to use certain event names in common, or by an addon that has to be run by multiple users who need to click each others' links.
 
 		Returns:
 			ChatLink
-				a string containing the chat link.
+				A string containing the chat link.
 			CallbackID
-				a callback event that should be subscribed to. The event fires when the user clicks the link.
+				The callback event (string value) that should be registered. The event fires when the user clicks the link.
 				If the caller specified an event name in the input, that same value is returned; otherwise a value is generated and returned.
 
 			If errors are encountered, returns nil for both outputs.
