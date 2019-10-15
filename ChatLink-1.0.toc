@@ -1,0 +1,16 @@
+#@retail@
+## Interface: 80205
+#@end-retail@
+#@non-retail@
+# ## Interface: 11302
+#@end-non-retail@
+## Title: ChatLink-1.0
+## Version: @project-version@
+## Author: KyrosKrane Sylvanblade
+## Notes: Library to create clickable chat links. Does nothing by itself. Must be integrated in another addon.
+
+# File revision: @file-abbreviated-hash@
+# File last updated: @file-date-iso@
+
+# In this addon
+ChatLink-1.0.lua
