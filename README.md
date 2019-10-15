@@ -1,8 +1,8 @@
 # ChatLink-1.0
 A framework for World of Warcraft addons to provide clickable chat links.
 
-Written by KyrosKrane Sylvanblade (kyros@kyros.info)
-Copyright (c) 2019 KyrosKrane Sylvanblade
+Written by KyrosKrane Sylvanblade (kyros@kyros.info)  
+Copyright (c) 2019 KyrosKrane Sylvanblade  
 Licensed under the MIT License, as per the included file.
 
 This library provides tools that let you create a chat link, then react to it when the user clicks the link.
