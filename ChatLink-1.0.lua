@@ -161,42 +161,6 @@ ChatLink.Mapping = {}
 
 
 --#########################################
---# Utility functions
---#########################################
-
--- Apparently string.split is not built into lua...
--- So we provide our own
--- Adapted from  the lua wiki post by PhilippeLhoste at:
---		http://lua-users.org/wiki/SplitJoin
- local function str_split(str, delim, maxNb)
-	-- Eliminate bad cases...
-	if string.find(str, delim) == nil then
-	   return { str }
-	end
-	if maxNb == nil or maxNb < 1 then
-	   maxNb = 0    -- No limit
-	end
-	local result = {}
-	local pat = "(.-)" .. delim .. "()"
-	local nb = 0
-	local lastPos
-	for part, pos in string.gmatch(str, pat) do
-	   nb = nb + 1
-	   result[nb] = part
-	   lastPos = pos
-	   if nb == maxNb then
-		  break
-	   end
-	end
-	-- Handle the last field
-	if nb ~= maxNb then
-	   result[nb + 1] = string.sub(str, lastPos)
-	end
-	return result
- end -- str_split()
-
-
- --#########################################
 --# Debug settings
 --#########################################
 
@@ -298,10 +262,7 @@ hooksecurefunc("SetItemRef", function(LinkData, FullLink)
 	ChatLink:DebugPrint("LinkData is " .. LinkData .. ", FullLink is " .. FullLink:gsub("|", "||"))
 
 	-- Get the parts of the link data
-	local LinkParts = str_split(LinkData, ":")
-
-	local BlizzLinkType, AddonLinker, MessageType, MessageID = unpack(LinkParts)
-	local Data = LinkData:match("^[^:]+:[^:]+:[^:]+:[^:]+:(.+)$")
+	local BlizzLinkType, AddonLinker, MessageType, MessageID, Data = strsplit(":", LinkData, 5)
 	ChatLink:DebugPrint("BlizzLinkType is ", BlizzLinkType)
 	ChatLink:DebugPrint("AddonLinker is ", AddonLinker)
 	ChatLink:DebugPrint("MessageType is ", MessageType)
@@ -316,7 +277,7 @@ hooksecurefunc("SetItemRef", function(LinkData, FullLink)
 	end
 
 	-- Extract the sender ID and message ID to make sure it's our message
-	local SenderID, SeqID = unpack(str_split(MessageID, "-"))
+	local SenderID, SeqID = strsplit("-", MessageID)
 	ChatLink:DebugPrint("SenderID is ", SenderID)
 	ChatLink:DebugPrint("SeqID is ", SeqID)
 	ChatLink:DebugPrint("ChatLink.ID is ", ChatLink.ID)
