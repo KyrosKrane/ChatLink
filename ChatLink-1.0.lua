@@ -58,7 +58,7 @@
 
 	Link Creation API
 
-		ChatLink, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
+		Link, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
 
 		This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
 		The calling app should subscribe to the callback identifier to handle the click event, and can unsubscribe after the first click if multiple clicks are not desired.
@@ -84,7 +84,7 @@
 				This feature can be used for multiple addons that coordinate to use certain event names in common, or by an addon that has to be run by multiple users who need to click each others' links.
 
 		Returns:
-			ChatLink
+			Link
 				A string containing the chat link.
 			CallbackID
 				The callback event (string value) that should be registered. The event fires when the user clicks the link.
@@ -111,7 +111,7 @@ assert(CBH, MAJOR .. " requires CallbackHandler-1.0")
 ChatLink.callbacks = ChatLink.callbacks or CBH:New(ChatLink, nil, nil, false)
 
 -- Get a random value for our self ID. Seven characters should be sufficient.
-ChatLink.ID = string.format("0x%7.7X", math.random() * 16^7)
+ChatLink.ID = string.format("0x%7.7X", math.random(16^7))
 
 
 --#########################################
@@ -192,9 +192,14 @@ end -- ChatLink:DebugPrint()
 --# Chat link creation
 --#########################################
 
+-- Create a fake MD5 hashing function
+local function GetRandomID(...)
+	return string.format("%7.7X%7.7X%7.7X%7.7X%4.4X", math.random(16^7), math.random(16^7), math.random(16^7), math.random(16^7), math.random(16^4))
+end
+
 -- This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
 -- See the API section above for full documentation
-function ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
+function ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID, IsPublic)
 	-- Validate the inputs
 	if not DisplayText or "string" ~= type(DisplayText) then
 		return nil, nil
@@ -210,7 +215,9 @@ function ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
 	if CallbackID and "string" ~= type(CallbackID) then
 		return nil, nil
 	end
-
+	if IsPublic and "boolean" ~= type(IsPublic) then
+		return nil, nil
+	end
 
 	-- First format the text for display
 	local TextPart
@@ -227,8 +234,13 @@ function ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
 	--	Message ID
 	--	Data
 
-	-- At present, MessageType is not implemented
-	local MessageType = PUBLIC
+	-- Determine whether the link should be clickable by anyone, or just the sender
+	local MessageType
+	if IsPublic then
+		MessageType = PUBLIC
+	else
+		MessageType = PRIVATE
+	end
 
 	-- The message ID is how we link the ID used in the link to the callback.
 	-- A message ID consists of a sender ID, a dash, then a sequence number

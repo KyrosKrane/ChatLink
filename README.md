@@ -62,7 +62,7 @@ The callback parameters are:
 
 ## Link Creation API
 ```lua
-    ChatLink, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
+    Link, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
 ```
 This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
 
@@ -90,7 +90,7 @@ The calling app should subscribe to the callback identifier to handle the click 
   - This feature can be used for multiple addons that coordinate to use certain event names in common, or by an addon that has to be run by multiple users who need to click each others' links.
 
 ### Returns:
-- ChatLink
+- Link
   - A string containing the chat link.
   
 - CallbackID
