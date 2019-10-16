@@ -57,12 +57,12 @@ The callback parameters are:
   - See "SkipFormat" in the Link Creation API below for how this might differ from what was passed in.
 
 - Data
-  -The Data that was passed to CreateChatLink().
+  - The Data that was passed to CreateChatLink().
   - Data is returned unchanged.
 
 ## Link Creation API
 ```lua
-ChatLink, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
+    ChatLink, CallbackID = ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID)
 ```
 This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
 
