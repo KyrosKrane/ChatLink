@@ -124,13 +124,33 @@ local CBH = LibStub("CallbackHandler-1.0")
 assert(CBH, MAJOR .. " requires CallbackHandler-1.0")
 ChatLink.callbacks = ChatLink.callbacks or CBH:New(ChatLink, nil, nil, false)
 
--- Get a random value for our self ID. Eight characters should be sufficient.
-ChatLink.ID = string.format("%4.4X%4.4X", math.random(16^4), math.random(16^4))
+-- Get the hashing and encoding libraries
+local MD5 = LibStub("MDFive-1.0")
+assert(MD5, MAJOR .. " requires MDFive-1.0")
 
--- Get a value used when hashing data to prove a link came from us
--- Note that this is a local value so it cannot be overridden by other addons.
-local Salt = string.format("%7.7X%7.7X%7.7X%7.7X%4.4X", math.random(16^7), math.random(16^7), math.random(16^7), math.random(16^7), math.random(16^4))
+local LB64 = LibStub("LibBase64-1.0")
+assert(LB64, MAJOR .. " requires LibBase64-1.0")
 
+
+--#########################################
+--# Utility functions
+--#########################################
+
+-- This function gets an arbitrary number of random bytes encoded in a string
+
+local function GetRandom(n)
+	local t = {} -- table for storing the output
+	for i=1, n do
+	   table.insert(t, string.char(math.random(0, 255)))
+	end
+	return table.concat(t)
+ end
+
+function tohex(str)
+	return (str:gsub('.', function (c)
+		return string.format('%02X', string.byte(c))
+	end))
+end
 
 --#########################################
 --# Link Settings
@@ -145,6 +165,13 @@ local BLIZZ_LINK_TYPE = "garrmission"
 
 -- Set the link type's data paramater used by this library
 ChatLink.LinkType = "ChatLink"
+
+-- Get a random value for our self ID. 32 bits should be sufficient.
+ChatLink.ID = LB64.Encode(GetRandom(8))
+
+-- Get a value used when hashing data to prove a link came from us
+-- Note that this is a local value so it cannot be overridden by other addons.
+local Salt = LB64.Encode(GetRandom(32))
 
 
 --#########################################
@@ -210,10 +237,9 @@ end -- ChatLink:DebugPrint()
 --#########################################
 
 -- Create a hashing function
-local function GetHash(...)
-	-- Placeholder: fake hashing
-	-- @TODO: get a real hashing function
-	return "0123456789ABCDEF0123456789ABCDEF"
+local function GetHash(s)
+
+	return LB64.Encode(table.concat(MD5.MD5AsTable(s)))
 end
 
 -- This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
