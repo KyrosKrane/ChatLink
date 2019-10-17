@@ -1,12 +1,19 @@
 package-as: ChatLink-1.0
-enable-nolib-creation: no
+enable-nolib-creation: yes
 
 # Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
 ignore:
-  - README.md
+  - *.md
+  - *.txt
   - Extras
   - Tests
+  - Libs/libbase64-1.0/LibStub
+  - Libs/libbase64-1.0/Tests
+  - Libs/LibStub/tests/
 
-required-dependencies:
-  - LibStub
-  - CallbackHandler-1.0
+externals:
+    # Prereqs
+    Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+    Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    Libs/MD5-1.0: https://repos.wowace.com/wow/project-14355/trunk/MD5-1.0
+    Libs/libbase64-1.0: https://repos.wowace.com/wow/libbase64-1-0
