@@ -6,7 +6,7 @@
 -- File revision: @file-abbreviated-hash@
 -- File last updated: @file-date-iso@
 
---[[
+--[==[
 This library provides tools that let you create a chat link, then react to it when the user clicks the link.
 
 Sample use cases
@@ -38,7 +38,7 @@ Usage:
 		end
 
 		The user will see:
-			You can [click here] to do the thing.
+			You can [[click here]] to do the thing.
 
 	5) When the user clicks the link, the callback you requested will be fired, and you can respond to that as you wish.
 		function MyAddon:HandleClick(CallbackID, DisplayText, Data)
@@ -102,7 +102,7 @@ Persistent Private Links
 
 	This is something under consideration for future development.
 
-]]
+]==]
 
 --#########################################
 --# Script setup
@@ -124,9 +124,8 @@ local CBH = LibStub("CallbackHandler-1.0")
 assert(CBH, MAJOR .. " requires CallbackHandler-1.0")
 ChatLink.callbacks = ChatLink.callbacks or CBH:New(ChatLink, nil, nil, false)
 
--- Get the hashing and encoding libraries
-local MD5 = LibStub("MDFive-1.0")
-assert(MD5, MAJOR .. " requires MDFive-1.0")
+local sha1 = LibStub("LibSHA1")
+assert(sha1, MAJOR .. " requires LibSHA1")
 
 local LB64 = LibStub("LibBase64-1.0")
 assert(LB64, MAJOR .. " requires LibBase64-1.0")
@@ -136,23 +135,116 @@ assert(LB64, MAJOR .. " requires LibBase64-1.0")
 --# Utility functions
 --#########################################
 
--- This function gets an arbitrary number of random bytes encoded in a string
-
-local function GetRandom(n)
-	local t = {} -- table for storing the output
-	for i=1, n do
-	   table.insert(t, string.char(math.random(0, 255)))
+ -- These functions for converting a table to a string are taken from:
+ -- http://lua-users.org/wiki/TableUtils
+ local function table_val_to_str(v)
+	if "string" == type(v) then
+		v = string.gsub(v, "\n", "\\n")
+		if string.match(string.gsub(v, '[^\'"]', ""), '^"+$') then
+			return "'" .. v .. "'"
+		end
+		return '"' .. string.gsub(v, '"', '\\"') .. '"'
+	else
+		return "table" == type(v) and table_tostring(v) or tostring(v)
 	end
-	return table.concat(t)
- end
-
-function tohex(str)
-	return (str:gsub('.', function (c)
-		return string.format('%02X', string.byte(c))
-	end))
 end
 
---#########################################
+
+local function table_key_to_str(k)
+	if "string" == type(k) and string.match(k, "^[_%a][_%a%d]*$") then
+		return k
+	else
+		return "[" .. table_val_to_str(k) .. "]"
+	end
+end
+
+
+local function table_tostring(tbl)
+	local result, done = {}, {}
+	for k, v in ipairs(tbl) do
+		table.insert(result, table_val_to_str(v))
+		done[k] = true
+	end
+	for k, v in pairs(tbl) do
+		if not done[k] then
+			table.insert(result, table_key_to_str(k) .. "=" .. table_val_to_str(v))
+		end
+	end
+	return "{" .. table.concat(result, ",") .. "}"
+end
+
+
+-- This function gets an arbitrary number of random bytes encoded in a string
+local function GetRandom(n)
+	local beginTime = debugprofilestop()
+
+	local t = {} -- table for storing the output
+	for i = 1, n do
+		table.insert(t, string.char(math.random(0, 255)))
+	end
+	local out = table.concat(t)
+	local timeUsed = debugprofilestop()  - beginTime
+	ChatLink:DebugPrint(("GetRandom with %d used %s ms."):format(n, timeUsed))
+	return out
+end
+
+
+-- Create a hashing function
+-- If any input parameter is nil, it is treated as an empty string.
+-- Otherwise, it returns the MD5 of the concatenation of all the arguments.
+local function GetHash(...)
+	local FuncStart = debugprofilestop()
+
+	-- Get the number of arguments
+	local n=select('#', ...)
+
+	-- Iterate over the arguments. Replace nils with an empty string, and replace other non-strings with a string represenation.
+	local args = {}
+	local v
+	for i = 1, n do
+		v = select(i, ...)
+		if nil == v then
+			args[i] = ""
+		elseif "table" == type(v) then
+			args[i] = table_tostring(v) -- brute-force serialization
+		else
+			args[i] = tostring(v)
+		end
+	end -- for
+
+	local concat_args = table.concat(args)
+
+	local ArgParseTime = debugprofilestop()  - FuncStart
+	ChatLink:DebugPrint(("Arg parsing with %d params used %s ms."):format(n, ArgParseTime))
+
+	--ChatLink:DebugPrint((concat_args):gsub("|", "||"))
+
+	-- Concatenate the arguments table, hash it (which returns the binary hash in four parts), combine the hash parts, and Base64-encode the resulting binary value.
+	-- local hash = table.concat(MD5.MD5AsTable(concat_args))
+	-- local hash = MD5Lua.sum(concat_args)
+	local HashStart = debugprofilestop()
+	local hash = sha1.binary(concat_args)
+	local HashTime = debugprofilestop()  - HashStart
+	ChatLink:DebugPrint(("Hashing used %s ms."):format(HashTime))
+
+	local EncodeStart = debugprofilestop()
+	local out = LB64.Encode(hash)
+	local EncodeTime = debugprofilestop()  - EncodeStart
+	ChatLink:DebugPrint(("Base64 encoding used %s ms."):format(EncodeTime))
+
+	local timeUsed = debugprofilestop()  - FuncStart
+	ChatLink:DebugPrint(("GetHash with %d params used %s ms."):format(n, timeUsed))
+
+	return out
+
+end -- GetHash()
+
+
+-- A no-op function to silence Luacheck on empty "if" branches
+local function NOOP() end
+
+
+ --#########################################
 --# Link Settings
 --#########################################
 
@@ -166,12 +258,12 @@ local BLIZZ_LINK_TYPE = "garrmission"
 -- Set the link type's data paramater used by this library
 ChatLink.LinkType = "ChatLink"
 
--- Get a random value for our self ID. 32 bits should be sufficient.
-ChatLink.ID = LB64.Encode(GetRandom(8))
+-- Get a random value for our self ID. Six bytes of data becomes eight characters when encoded; that should be plenty.
+ChatLink.ID = LB64.Encode(GetRandom(6))
 
 -- Get a value used when hashing data to prove a link came from us
 -- Note that this is a local value so it cannot be overridden by other addons.
-local Salt = LB64.Encode(GetRandom(32))
+local Salt = LB64.Encode(GetRandom(128))
 
 
 --#########################################
@@ -235,12 +327,6 @@ end -- ChatLink:DebugPrint()
 --#########################################
 --# Chat link creation
 --#########################################
-
--- Create a hashing function
-local function GetHash(s)
-
-	return LB64.Encode(table.concat(MD5.MD5AsTable(s)))
-end
 
 -- This function creates a chat link and sets up a callback (using CallbackHandler) that will be fired when the user clicks the link.
 -- See the API section above for full documentation
@@ -307,7 +393,7 @@ function ChatLink:CreateChatLink(DisplayText, Data, SkipFormat, CallbackID, Publ
 		ChatLink.LinkCount = ChatLink.LinkCount + 1
 		MessageID = string.format("%s-%s", ChatLink.ID, ChatLink.LinkCount)
 		-- Hash the secure parts of the data.
-		Hash = GetHash(string.format("|%s|%s|%s|%s|", MessageID, Data, TextPart, Salt))
+		Hash = GetHash("**", MessageID, "**", Data, "**", TextPart, "**", Salt, "**")
 	end
 
 	-- Assemble the data portion of the link
@@ -325,7 +411,7 @@ end -- ChatLink:CreateChatLink()
 
 -- For public links, sometimes you want to just handle links that are created by another person.
 -- In that scenario, you can just register a callback for your PublicMessageID without having to create a link first
--- The parameters CallbackID and PublicMessageID are the same as those used by CreateChatLink().
+-- The parameters PublicMessageID and CallbackID are the same as those used by CreateChatLink().
 -- PublicMessageID is required. CallbackID is optional; if not provided, a value will be generated and returned.
 -- Returns the CallbackID if the handler was registered successfully, nil if there was an error in the input values
 -- Note that there can only be one CallbackID for each PublicMessageID. Subsequent calls with the same PublicMessageID will replace the prior CallbackID.
@@ -385,7 +471,7 @@ hooksecurefunc("SetItemRef", function(LinkData, FullLink)
 	-- Validate private messages
 	if IsPublic == PRIVATE then
 		-- Make sure the hash matches
-		local ValidationHash = GetHash(string.format("|%s|%s|%s|%s|", MessageID, Data, TextPart, Salt))
+		local ValidationHash = GetHash("**", MessageID, "**", Data, "**", TextPart, "**", Salt, "**")
 		ChatLink:DebugPrint("ValidationHash is ", ValidationHash)
 		if ValidationHash ~= Hash then
 			-- Bad chat link
@@ -403,6 +489,7 @@ hooksecurefunc("SetItemRef", function(LinkData, FullLink)
 		end
 	elseif IsPublic == PUBLIC then
 		-- no special validation
+		NOOP()
 	else
 		-- Bad public/private marker
 		ChatLink:DebugPrint("Invalid IsPublic value")

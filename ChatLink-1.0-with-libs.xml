@@ -3,6 +3,6 @@
 	<Script file="Libs/LibStub/LibStub.lua"/>
 	<Include file="Libs/CallbackHandler-1.0/CallbackHandler-1.0.xml"/>
 	<Include file="Libs/libbase64-1.0/lib.xml"/>
-	<Script file="Libs/MD5-1.0/MD5-1.0.lua"/>
+	<Script file="Libs/LibSHA1/LibSHA1-1.0.xml"/>
 	<Script file="ChatLink-1.0.lua"/>
 </Ui>

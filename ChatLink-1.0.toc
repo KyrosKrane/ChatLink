@@ -21,7 +21,7 @@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\libbase64-1-0\LibBase64-1.0.lua
-Libs\MD5-1.0\MD5-1.0.lua
+Libs\LibSHA1\LibSHA1.lua
 #@end-no-lib-strip@
 
 

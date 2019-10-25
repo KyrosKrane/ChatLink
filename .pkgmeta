@@ -9,10 +9,11 @@ ignore:
   - Libs/libbase64-1.0/LibStub
   - Libs/libbase64-1.0/Tests
   - Libs/LibStub/tests
+  - Libs/LibSHA1/WoW_Tests
 
 externals:
     # Prereqs
     Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
     Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
-    Libs/MD5-1.0: https://repos.wowace.com/wow/project-14355/trunk/MD5-1.0
+    Libs/LibSHA1: https://github.com/KyrosKrane/LibSHA1
     Libs/libbase64-1.0: https://repos.wowace.com/wow/libbase64-1-0
