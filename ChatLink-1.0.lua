@@ -122,13 +122,43 @@ if not ChatLink then return end
 -- Set up the callback handler
 local CBH = LibStub("CallbackHandler-1.0")
 assert(CBH, MAJOR .. " requires CallbackHandler-1.0")
-ChatLink.callbacks = ChatLink.callbacks or CBH:New(ChatLink, nil, nil, false)
+ChatLink.callbacks = CBH:New(ChatLink, nil, nil, false)
 
 local sha1 = LibStub("LibSHA1")
 assert(sha1, MAJOR .. " requires LibSHA1")
 
 local LB64 = LibStub("LibBase64-1.0")
 assert(LB64, MAJOR .. " requires LibBase64-1.0")
+
+
+--#########################################
+--# Debug settings
+--#########################################
+
+-- True turns on debugging output, which users shouldn't normally need to see.
+ChatLink.DebugMode = false
+
+--@alpha@
+ChatLink.DebugMode = true
+--@end-alpha@
+
+-- Print debug output to the chat frame.
+function ChatLink:DebugPrint(...)
+	if not ChatLink.DebugMode then return end
+
+	local msg = ""
+	local args = { n = select("#", ...), ... }
+	for i=1,args.n do
+	   if i > 1 then msg = msg .. " " end
+	   if nil == args[i] then
+		  msg = msg .. "nil"
+	   else
+		  msg = msg .. tostring(args[i])
+	   end
+	end
+
+	DEFAULT_CHAT_FRAME:AddMessage("ChatLink Debug: " .. msg)
+end -- ChatLink:DebugPrint()
 
 
 --#########################################
@@ -244,7 +274,7 @@ end -- GetHash()
 local function NOOP() end
 
 
- --#########################################
+--#########################################
 --# Link Settings
 --#########################################
 
@@ -292,36 +322,6 @@ ChatLink.LinkCount = 0
 
 -- Keep a map of link IDs to callback values.
 ChatLink.Mapping = {}
-
-
---#########################################
---# Debug settings
---#########################################
-
--- True turns on debugging output, which users shouldn't normally need to see.
-ChatLink.DebugMode = false
-
---@alpha@
-ChatLink.DebugMode = true
---@end-alpha@
-
--- Print debug output to the chat frame.
-function ChatLink:DebugPrint(...)
-	if not ChatLink.DebugMode then return end
-
-	local msg = ""
-	local args = { n = select("#", ...), ... }
-	for i=1,args.n do
-	   if i > 1 then msg = msg .. " " end
-	   if nil == args[i] then
-		  msg = msg .. "nil"
-	   else
-		  msg = msg .. tostring(args[i])
-	   end
-	end
-
-	DEFAULT_CHAT_FRAME:AddMessage("ChatLink Debug: " .. msg)
-end -- ChatLink:DebugPrint()
 
 
 --#########################################
