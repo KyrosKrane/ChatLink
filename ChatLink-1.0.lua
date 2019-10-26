@@ -298,8 +298,8 @@ ChatLink.Mapping = {}
 --# Debug settings
 --#########################################
 
- -- True turns on debugging output, which users shouldn't normally need to see.
- ChatLink.DebugMode = false
+-- True turns on debugging output, which users shouldn't normally need to see.
+ChatLink.DebugMode = false
 
 --@alpha@
 ChatLink.DebugMode = true

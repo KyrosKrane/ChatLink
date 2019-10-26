@@ -20,8 +20,8 @@
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
-Libs\libbase64-1-0\LibBase64-1.0.lua
-Libs\LibSHA1\LibSHA1.lua
+Libs\libbase64-1.0\LibBase64-1.0.lua
+Libs\LibSHA1\LibSHA1-1.0.xml
 #@end-no-lib-strip@
 
 
