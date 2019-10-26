@@ -4,5 +4,5 @@
 	<Include file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
 	<Include file="Libs\libbase64-1.0\lib.xml"/>
 	<Include file="Libs\LibSHA1\LibSHA1-1.0.xml"/>
-	<Script file="ChatLink-1.0.lua"/>
+	<Include file="ChatLink-1.0.xml"/>
 </Ui>
