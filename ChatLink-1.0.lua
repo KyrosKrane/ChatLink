@@ -1,6 +1,6 @@
 -- ChatLink-1.0.lua
 -- Written by KyrosKrane Sylvanblade (kyros@kyros.info)
--- Copyright (c) 2019 KyrosKrane Sylvanblade
+-- Copyright (c) 2021 KyrosKrane Sylvanblade
 -- Licensed under the MIT License, as per the included file.
 
 -- File revision: @file-abbreviated-hash@
@@ -221,7 +221,7 @@ end
 
 -- Create a hashing function
 -- If any input parameter is nil, it is treated as an empty string.
--- Otherwise, it returns the MD5 of the concatenation of all the arguments.
+-- Otherwise, it returns the SHA1 of the concatenation of all the arguments.
 local function GetHash(...)
 	local FuncStart = debugprofilestop()
 
@@ -250,8 +250,6 @@ local function GetHash(...)
 	--ChatLink:DebugPrint((concat_args):gsub("|", "||"))
 
 	-- Concatenate the arguments table, hash it (which returns the binary hash in four parts), combine the hash parts, and Base64-encode the resulting binary value.
-	-- local hash = table.concat(MD5.MD5AsTable(concat_args))
-	-- local hash = MD5Lua.sum(concat_args)
 	local HashStart = debugprofilestop()
 	local hash = sha1.binary(concat_args)
 	local HashTime = debugprofilestop()  - HashStart
