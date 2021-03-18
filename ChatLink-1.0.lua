@@ -74,7 +74,7 @@ Link Creation API
 			This must NOT include any pipe characters (|). If it does, the function returns the error values nil, nil.
 		SkipFormat
 			An optional boolean defaulting to false.
-			If it is true, the function will use DisplayText verbatim, without applying formatting. The calling addon supplies its own formatting. Note that pipe symbols are NOT escapte if SkipFormat is true, which means it's up to the calling addon to ensure the pipes are correct and don't corrupt the link.
+			If it is true, the function will use DisplayText verbatim, without applying formatting. The calling addon supplies its own formatting. Note that pipe symbols are NOT escaped if SkipFormat is true, which means it's up to the calling addon to ensure the pipes are correct and don't corrupt the link.
 			If it is false or nil (not specified), the library will automatically enclose DisplayText in brackets and highlight it in color for visibility.  Pipe symbols will also be escaped to prevent corrupting the chat link.
 		CallbackID
 			The optional event name of a callback event that is fired when the user clicks a link.
