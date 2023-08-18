@@ -6,7 +6,6 @@
 ## Version: @project-version@
 ## Author: KyrosKrane Sylvanblade
 ## Notes: Library to create clickable chat links. Does nothing by itself. Must be integrated in another addon.
-## Dependencies: LibStub, CallbackHandler-1.0
 
 ## X-Curse-Project-ID: 348037
 ## X-WoWI-ID: 25402
