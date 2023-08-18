@@ -99,7 +99,7 @@
 --#########################################
 
 -- Use Libstub to set up as a library
-local MAJOR, MINOR = "ChatLink-1.0", 1
+local MAJOR, MINOR = "ChatLink-1.0", 2
 assert(LibStub, MAJOR .. " requires LibStub")
 
 local ChatLink, oldversion = LibStub:NewLibrary(MAJOR, MINOR)
@@ -122,8 +122,8 @@ ChatLink.ID = string.format("0x%7.7X", math.random(16^7))
 
 -- This is the Blizzard link type. It can only be one of a set number of values, documented here:
 -- https://wow.gamepedia.com/UI_escape_sequences
--- And of those, only a very few can be overloaded for our purposes. The "garrmission" type is safest to use.
-local BLIZZ_LINK_TYPE = "garrmission"
+-- As of patch 10.1.0, Blizzard has added a specific link type for use by addons.
+local BLIZZ_LINK_TYPE = "addon"
 
 -- Set the link type's data paramater used by this library
 ChatLink.LinkType = "ChatLink"
