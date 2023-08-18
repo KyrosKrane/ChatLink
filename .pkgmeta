@@ -1,12 +1,17 @@
 package-as: ChatLink-1.0
 enable-nolib-creation: no
 
+# Automatically create multiple TOC files for each game version
+enable-toc-creation: yes
+
 # Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
 ignore:
   - README.md
   - Extras
   - Tests
   - Curse description.md
+  - Libs/LibStub/tests
+  - Libs/LibStub/LibStub.toc
 
 externals:
     Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
