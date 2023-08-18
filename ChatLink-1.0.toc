@@ -14,5 +14,9 @@
 # File revision: @file-abbreviated-hash@
 # File last updated: @file-date-iso@
 
+# Linked from externals
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
 # In this addon
 ChatLink-1.0.lua
